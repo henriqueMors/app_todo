@@ -50,7 +50,7 @@ export const Cadastro = () => {
           <Input
             {...register('password', {
               required: 'Campo obrigatório',
-              minLength: { value: 6, message: 'A senha deve ter pelo menos 6 caracteres' },
+              minLength: { value: 8, message: 'A senha deve ter pelo menos 8 caracteres' },
             })}
             placeholder="Crie uma senha"
             type="password"
@@ -93,7 +93,7 @@ export const Cadastro = () => {
           Já tenho conta
         </Button>
 
-        <FormControl display="flex" alignItems="center">
+        <FormControl display="flex" alignItems="center" justifyContent="center">
           <Theme showLabel={true} />
         </FormControl>
       </Flex>

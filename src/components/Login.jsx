@@ -68,7 +68,9 @@ export const Login = () => {
         >
           Cadastre-se
         </Button>
-        <Theme showLabel={true} mb={4} />
+        <FormControl display="flex" alignItems="center" justifyContent="center">
+          <Theme showLabel={true} />
+        </FormControl>
       </Flex>
     </Flex>
   )

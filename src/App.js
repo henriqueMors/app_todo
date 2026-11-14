@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Login.jsx';
+import { Cadastro } from './components/Cadastro.jsx';
 
 function App() {
   return (
@@ -7,10 +8,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" 
-          element={<Login />}
+            element={<Login />}
           />
           <Route path="/cadastro"
-          element={<h1>Cadastro</h1>}
+            element={<Cadastro />}
           />
         </Routes>
       </Router>
