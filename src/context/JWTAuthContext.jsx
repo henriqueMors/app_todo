@@ -1,51 +1,113 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useReducer } from 'react'
 import axios from 'axios'
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+const api = axios.create({ baseURL: process.env.REACT_APP_API_URL })
+
+const initialState = {
+  isAuthenticated: false,
+  isInitialized: false,
+  user: null,
+}
+
+const handlers = {
+  INITIALIZED: (state, action) => {
+    const { isAuthenticated, user } = action.payload
+    return {
+      ...state,
+      isAuthenticated,
+      isInitialized: true,
+      user,
+    }
+  },
+  LOGIN: (state, action) => {
+    const { user } = action.payload
+    return {
+      ...state,
+      isAuthenticated: true,
+      user,
+    }
+  },
+  LOGOUT: (state) => ({
+    ...state,
+    isAuthenticated: false,
+    user: null,
+  }),
+  REGISTER: (state, action) => {
+    const { user } = action.payload
+    return {
+      ...state,
+      isAuthenticated: true,
+      user,
+    }
+  },
+}
+
+const reducer = (state, action) =>
+  handlers[action.type] ? handlers[action.type](state, action) : state
+
+const setSession = (token) => {
+  if (token) {
+    localStorage.setItem('accessToken', token)
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+  } else {
+    localStorage.removeItem('accessToken')
+    delete api.defaults.headers.common.Authorization
+  }
+}
+
+export const AuthContext = createContext({
+  ...initialState,
+  method: 'jwt',
+  login: () => Promise.resolve(),
+  logout: () => Promise.resolve(),
+  register: () => Promise.resolve(),
 })
 
-const AuthContext = createContext(null)
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [token, setToken] = useState(() => localStorage.getItem('token'))
-  const [loading, setLoading] = useState(true)
+  const [state, dispatch] = useReducer(reducer, initialState)
 
-  // Sempre que o token mudar, coloca ou retira ele das requisições
+  // Ao abrir o app: verifica se já existe token salvo
   useEffect(() => {
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      localStorage.setItem('token', token)
-    } else {
-      delete api.defaults.headers.common['Authorization']
-      localStorage.removeItem('token')
+    const initialize = async () => {
+      try {
+        const token = localStorage.getItem('accessToken')
+        if (token) {
+          setSession(token)
+          const response = await api.get('/auth/me')
+          dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: true, user: response.data } })
+        } else {
+          dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
+        }
+      } catch (error) {
+        setSession(null)
+        dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
+      }
     }
-    setLoading(false)
-  }, [token])
+    initialize()
+  }, [])
 
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password })
-    setToken(response.data.access_token)
-    setUser(response.data.user)
+    const { access_token, user } = response.data
+    setSession(access_token)
+    dispatch({ type: 'LOGIN', payload: { user } })
   }
 
   const register = async (nome, email, password) => {
-    await api.post('/auth/register', { nome, email, password })
+    const response = await api.post('/auth/register', { nome, email, password })
+    const { access_token, user } = response.data
+    setSession(access_token)
+    dispatch({ type: 'REGISTER', payload: { user } })
   }
 
   const logout = () => {
-    setToken(null)
-    setUser(null)
+    setSession(null)
+    dispatch({ type: 'LOGOUT' })
   }
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, isAuthenticated: !!token, loading, login, register, logout }}
-    >
+    <AuthContext.Provider value={{ ...state, method: 'jwt', login, logout, register }}>
       {children}
     </AuthContext.Provider>
   )
 }
-
-export const useAuth = () => useContext(AuthContext)
