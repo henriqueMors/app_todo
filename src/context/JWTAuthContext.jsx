@@ -1,5 +1,5 @@
 import { isValidToken } from '../utils/jwt'
-import { setSession } from '../utils/session'
+import { setSession, resetSession } from '../utils/session'
 import { createContext, useContext, useEffect, useReducer } from 'react'
 import axios from '../services/axios'
 
@@ -82,20 +82,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await axios.post('/auth/login', { email, password })
-    const { access_token, user } = response.data
-    setSession(access_token)
+    const { access_token, refreshtoken, user } = response.data
+    setSession(access_token, refreshtoken)
     dispatch({ type: 'LOGIN', payload: { user } })
   }
 
   const register = async (nome, email, password) => {
     const response = await axios.post('/auth/register', { nome, email, password })
-    const { access_token, user } = response.data
-    setSession(access_token)
+    const { access_token, refreshtoken, user } = response.data
+    setSession(access_token, refreshtoken)
     dispatch({ type: 'REGISTER', payload: { user } })
   }
 
   const logout = () => {
-    setSession(null)
+    resetSession()
     dispatch({ type: 'LOGOUT' })
   }
 
