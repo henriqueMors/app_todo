@@ -1,9 +1,7 @@
-import { isValidToken } from '../utils/jwt'
-import { setSession, resetSession } from '../utils/session'
 import { createContext, useContext, useEffect, useReducer } from 'react'
 import axios from '../services/axios'
-
-export const useAuth = () => useContext(AuthContext)
+import { isValidToken } from '../utils/jwt'
+import { setSession, resetSession } from '../utils/session'
 
 const initialState = {
   isAuthenticated: false,
@@ -72,7 +70,7 @@ export const AuthProvider = ({ children }) => {
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
         }
       } catch (error) {
-        setSession(null)
+        resetSession()
         dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
       }
     }
@@ -82,15 +80,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await axios.post('/auth/login', { email, password })
-    const { access_token, refreshtoken, user } = response.data
-    setSession(access_token, refreshtoken)
+    const { access_token, refresh_token, user } = response.data
+    setSession(access_token, refresh_token)
     dispatch({ type: 'LOGIN', payload: { user } })
   }
 
   const register = async (nome, email, password) => {
     const response = await axios.post('/auth/register', { nome, email, password })
-    const { access_token, refreshtoken, user } = response.data
-    setSession(access_token, refreshtoken)
+    const { access_token, refresh_token, user } = response.data
+    setSession(access_token, refresh_token)
     dispatch({ type: 'REGISTER', payload: { user } })
   }
 
@@ -105,3 +103,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+
+export const useAuth = () => useContext(AuthContext)
