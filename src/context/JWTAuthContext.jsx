@@ -1,8 +1,6 @@
 import { createContext, useEffect, useReducer } from 'react'
-import axios from 'axios'
+import axios from '../services/axios'
 import { isValidToken, setSession } from '../utils/jwt'
-
-axios.defaults.baseURL = process.env.REACT_APP_API_URL
 
 const initialState = {
   isAuthenticated: false,

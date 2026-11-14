@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode'
-import axios from 'axios'
+import axios from '../services/axios'
 
 export const isValidToken = (accessToken) => {
   if (!accessToken) {
