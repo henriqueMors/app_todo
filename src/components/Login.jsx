@@ -24,8 +24,8 @@ export const Login = () => {
         <Heading mb={6}>Login</Heading>
         <FormControl isInvalid={!!errors.email}>
           <Input
-            {...register('email', { required: 'Email is required' })}
-            placeholder="Email"
+            {...register('email', { required: 'Campo obrigatório' })}
+            placeholder="Informe seu e-mail"
             type="email"
           />
           <FormErrorMessage>
@@ -34,8 +34,8 @@ export const Login = () => {
         </FormControl>
         <FormControl isInvalid={!!errors.password} mt={4}>
           <Input
-            {...register('password', { required: 'Password is required' })}
-            placeholder="Password"
+            {...register('password', { required: 'Campo obrigatório' })}
+            placeholder="Informe sua senha"
             type="password"
           />
           <FormErrorMessage>
