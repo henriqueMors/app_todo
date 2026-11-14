@@ -8,7 +8,7 @@ export const Theme = ({ showLabel = false, ...props }) => {
       {
         showLabel && (
           <FormLabel htmlFor='theme-toggler' mb={0}>
-            Habilitar Tema Dark
+            Tema
           </FormLabel>
         )
       }

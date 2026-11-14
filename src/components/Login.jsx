@@ -1,6 +1,7 @@
 import { Flex, useColorModeValue, FormControl, Heading, Input, FormErrorMessage, Button } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { Theme } from './Theme/Theme'
 
 export const Login = () => {
   const formBackground = useColorModeValue('white', 'gray.600')
@@ -48,6 +49,7 @@ export const Login = () => {
         <Button
           mt={4}
           mb={2}
+          w="100%"
           colorScheme="blue"
           type="submit"
           isLoading={isSubmitting}
@@ -57,13 +59,16 @@ export const Login = () => {
         </Button>
 
         <Button
-          variant="link"
+          mb={2}
+          w="100%"
           colorScheme="blue"
+          variant="outline"
           type="button"
           onClick={() => navigate('/cadastro', { replace: true })}
         >
-          Não tem conta? Cadastre-se
+          Cadastre-se
         </Button>
+        <Theme showLabel={true} mb={4} />
       </Flex>
     </Flex>
   )
