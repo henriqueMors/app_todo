@@ -25,9 +25,14 @@ export const Cadastro = () => {
       })
       navigate('/login', { replace: true })
     } catch (error) {
+      const detail = error?.detail
+      const mensagem = Array.isArray(detail)
+        ? detail.map((d) => `${d.loc?.at(-1)}: ${d.msg}`).join(' | ')
+        : detail || 'Tente novamente.'
+
       toast({
         title: 'Erro ao cadastrar',
-        description: error?.detail ? JSON.stringify(error.detail) : 'Tente novamente.',
+        description: mensagem,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -49,13 +54,13 @@ export const Cadastro = () => {
       >
         <Heading mb={6}>Cadastro</Heading>
 
-        <FormControl isInvalid={!!errors.nome}>
+        <FormControl isInvalid={!!errors.username}>
           <Input
-            {...register('nome', { required: 'Campo obrigatório' })}
-            placeholder="Informe seu nome"
+            {...register('username', { required: 'Campo obrigatório' })}
+            placeholder="Informe seu nome de usuário"
             type="text"
           />
-          <FormErrorMessage>{errors.nome?.message}</FormErrorMessage>
+          <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
         </FormControl>
 
         <FormControl isInvalid={!!errors.email} mt={4}>
