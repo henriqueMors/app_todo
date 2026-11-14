@@ -32,14 +32,6 @@ const handlers = {
     isAuthenticated: false,
     user: null,
   }),
-  REGISTER: (state, action) => {
-    const { user } = action.payload
-    return {
-      ...state,
-      isAuthenticated: true,
-      user,
-    }
-  },
 }
 
 const reducer = (state, action) =>
@@ -64,7 +56,7 @@ export const AuthProvider = ({ children }) => {
 
         if (accessToken && isValidToken(accessToken)) {
           setSession(accessToken)
-          const response = await axios.get('/auth/me')
+          const response = await axios.get('/users/me')
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: true, user: response.data } })
         } else {
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
@@ -79,17 +71,21 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (email, password) => {
-    const response = await axios.post('/auth/login', { email, password })
-    const { access_token, refresh_token, user } = response.data
+    const formData = new URLSearchParams()
+    formData.append('username', email)
+    formData.append('password', password)
+
+    const response = await axios.post('/auth/login', formData)
+    const { access_token, refresh_token } = response.data
     setSession(access_token, refresh_token)
-    dispatch({ type: 'LOGIN', payload: { user } })
+
+    const me = await axios.get('/users/me')
+    dispatch({ type: 'LOGIN', payload: { user: me.data } })
   }
 
-  const register = async (nome, email, password) => {
-    const response = await axios.post('/auth/register', { nome, email, password })
-    const { access_token, refresh_token, user } = response.data
-    setSession(access_token, refresh_token)
-    dispatch({ type: 'REGISTER', payload: { user } })
+  const register = async (dados) => {
+    const response = await axios.post('/users/adiciona', dados)
+    return response.data
   }
 
   const logout = () => {
