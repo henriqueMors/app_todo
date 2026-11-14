@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000', // endereço do seu backend
+  baseURL: process.env.REACT_APP_API_URL,
 })
 
 const AuthContext = createContext(null)
