@@ -2,7 +2,7 @@ import { Flex, useColorModeValue, FormControl, Heading, Input, FormErrorMessage,
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { Theme } from './Theme/Theme'
-import { useAuth } from '../context/JwtAuthContext'
+import { useAuth } from '../context/JWTAuthContext'
 
 export const Login = () => {
   const formBackground = useColorModeValue('white', 'gray.600')

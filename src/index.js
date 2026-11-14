@@ -4,7 +4,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 import { ChakraProvider } from '@chakra-ui/react';
-import { AuthProvider } from './context/JwtAuthContext';
+import { AuthProvider } from './context/JWTAuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
