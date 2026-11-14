@@ -1,7 +1,8 @@
 import { createContext, useEffect, useReducer } from 'react'
 import axios from 'axios'
+import { isValidToken, setSession } from '../utils/jwt'
 
-const api = axios.create({ baseURL: process.env.REACT_APP_API_URL })
+axios.defaults.baseURL = process.env.REACT_APP_API_URL
 
 const initialState = {
   isAuthenticated: false,
@@ -45,16 +46,6 @@ const handlers = {
 const reducer = (state, action) =>
   handlers[action.type] ? handlers[action.type](state, action) : state
 
-const setSession = (token) => {
-  if (token) {
-    localStorage.setItem('accessToken', token)
-    api.defaults.headers.common.Authorization = `Bearer ${token}`
-  } else {
-    localStorage.removeItem('accessToken')
-    delete api.defaults.headers.common.Authorization
-  }
-}
-
 export const AuthContext = createContext({
   ...initialState,
   method: 'jwt',
@@ -66,14 +57,15 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  // Ao abrir o app: verifica se já existe token salvo
+  // Ao abrir o app: verifica se já existe um token salvo e válido
   useEffect(() => {
     const initialize = async () => {
       try {
-        const token = localStorage.getItem('accessToken')
-        if (token) {
-          setSession(token)
-          const response = await api.get('/auth/me')
+        const accessToken = localStorage.getItem('accessToken')
+
+        if (accessToken && isValidToken(accessToken)) {
+          setSession(accessToken)
+          const response = await axios.get('/auth/me')
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: true, user: response.data } })
         } else {
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
@@ -83,18 +75,19 @@ export const AuthProvider = ({ children }) => {
         dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
       }
     }
+
     initialize()
   }, [])
 
   const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password })
+    const response = await axios.post('/auth/login', { email, password })
     const { access_token, user } = response.data
     setSession(access_token)
     dispatch({ type: 'LOGIN', payload: { user } })
   }
 
   const register = async (nome, email, password) => {
-    const response = await api.post('/auth/register', { nome, email, password })
+    const response = await axios.post('/auth/register', { nome, email, password })
     const { access_token, user } = response.data
     setSession(access_token)
     dispatch({ type: 'REGISTER', payload: { user } })
