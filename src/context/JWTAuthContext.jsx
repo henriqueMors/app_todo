@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer } from 'react'
+import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import axios from '../services/axios'
 import { isValidToken } from '../utils/jwt'
 import { setSession, resetSession } from '../utils/session'
@@ -46,10 +46,13 @@ export const AuthContext = createContext({
 })
 
 export const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+    const [state, dispatch] = useReducer(reducer, initialState)
+    const isMounted = useRef(false)
 
   // Ao abrir o app: verifica se já existe um token salvo e válido
-  useEffect(() => {
+    useEffect(() => {
+    if (isMounted.current) return
+
     const initialize = async () => {
       try {
         const accessToken = localStorage.getItem('accessToken')
@@ -57,7 +60,8 @@ export const AuthProvider = ({ children }) => {
         if (accessToken && isValidToken(accessToken)) {
           setSession(accessToken)
           const response = await axios.get('/users/me')
-          dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: true, user: response.data } })
+          const { data: user } = response
+          dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: true, user } })
         } else {
           dispatch({ type: 'INITIALIZED', payload: { isAuthenticated: false, user: null } })
         }
@@ -68,6 +72,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     initialize()
+    isMounted.current = true
   }, [])
 
   const login = async (email, password) => {
