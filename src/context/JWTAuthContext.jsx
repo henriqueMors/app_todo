@@ -1,6 +1,9 @@
-import { createContext, useEffect, useReducer } from 'react'
+import { isValidToken } from '../utils/jwt'
+import { setSession } from '../utils/session'
+import { createContext, useContext, useEffect, useReducer } from 'react'
 import axios from '../services/axios'
-import { isValidToken, setSession } from '../utils/jwt'
+
+export const useAuth = () => useContext(AuthContext)
 
 const initialState = {
   isAuthenticated: false,
