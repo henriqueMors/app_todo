@@ -2,16 +2,22 @@ import { Flex, useColorModeValue, FormControl, Heading, Input, FormErrorMessage,
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { Theme } from './Theme/Theme'
+import { useAuth } from '../context/JwtAuthContext'
 
 export const Login = () => {
   const formBackground = useColorModeValue('white', 'gray.600')
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
   const navigate = useNavigate()
 
+  const { login } = useAuth()
+
   const onSubmit = async (values) => {
-    console.log(values)
-    // aqui entra a chamada à API de login
-    navigate('/cadastro') // exemplo: redireciona após o login
+    try {
+      await login(values.email, values.password)
+      navigate('/', { replace: true })
+    } catch (error) {
+      console.error('Erro no login', error)
+    }
   }
 
   return (
